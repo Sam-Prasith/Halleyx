@@ -16,15 +16,11 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
 
 console.log('ALLOWED_ORIGINS:', allowedOrigins);
 
-const corsOptions = {
+app.use(cors({
   origin: (origin, callback) => {
     console.log('Incoming origin:', origin);
 
-    if (!origin) {
-      return callback(null, true);
-    }
-
-    if (allowedOrigins.length === 0) {
+    if (!origin || allowedOrigins.length === 0) {
       return callback(null, true);
     }
 
@@ -32,15 +28,12 @@ const corsOptions = {
       return callback(null, true);
     }
 
-    return callback(null, false);
+    return callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
+}));
 
 // Middleware
 app.use(express.json());
