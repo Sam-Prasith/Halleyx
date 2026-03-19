@@ -18,15 +18,16 @@ console.log('ALLOWED_ORIGINS:', allowedOrigins);
 app.use(cors({
   origin: (origin, callback) => {
     console.log('Incoming origin:', origin);
-
-    if (!origin || allowedOrigins.length === 0) {
+    // Allow no-origin requests (mobile, curl, etc.)
+    if (!origin) return callback(null, true);
+    // Allow localhost
+    if (origin.includes('localhost')) return callback(null, true);
+    // Allow all vercel.app domains for this project
+    if (origin.includes('vercel.app')) return callback(null, true);
+    // Check explicit allowed origins
+    if (allowedOrigins.length === 0 || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-
     console.log('Blocked by CORS:', origin);
     return callback(null, false);
   },
