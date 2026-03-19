@@ -11,21 +11,36 @@ const app = express();
 
 // CORS setup
 const allowedOrigins = process.env.ALLOWED_ORIGINS
-  ? process.env.ALLOWED_ORIGINS.split(',')
+  ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : [];
 
-app.use(cors({
+console.log('ALLOWED_ORIGINS:', allowedOrigins);
+
+const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin || allowedOrigins.length === 0) {
+    console.log('Incoming origin:', origin);
+
+    if (!origin) {
       return callback(null, true);
     }
+
+    if (allowedOrigins.length === 0) {
+      return callback(null, true);
+    }
+
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    return callback(new Error('Not allowed by CORS'));
+
+    return callback(null, false);
   },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 
 // Middleware
 app.use(express.json());
