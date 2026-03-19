@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+
+/* ═══════════════════════════════════════════════════════
+   Design Tokens — Premium Indian Tech (Dark/Emerald/Slate)
+   ═══════════════════════════════════════════════════════ */
+:root {
+  /* Core palette */
+  --bg-root: #0f172a; /* Deep Slate */
+  --bg-surface: #1e293b;
+  --bg-card: rgba(30, 41, 59, 0.7);
+  --bg-elevated: #334155;
+
+  /* Glass */
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-hover: rgba(255, 255, 255, 0.04);
+  --glass-active: rgba(255, 255, 255, 0.06);
+
+  /* Accent — Premium Emerald / Indigo */
+  --accent: #10b981; /* Emerald */
+  --accent-light: #34d399;
+  --accent-glow: rgba(16, 185, 129, 0.2);
+  --accent-subtle: rgba(16, 185, 129, 0.06);
+  --accent-gradient: linear-gradient(135deg, #10b981 0%, #6366f1 100%); /* Emerald to Indigo */
+
+  /* Semantic */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #6366f1;
+
+  /* Text */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --text-accent: var(--accent);
+  
+  /* ... (rest of tokens remain similar) */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+}
+
+body {
+  font-family: 'Outfit', -apple-system, sans-serif;
+  background: var(--bg-root);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(37, 99, 235, 0.18);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(37, 99, 235, 0.35); }
+
+/* ── Selection ── */
+::selection {
+  background: rgba(37, 99, 235, 0.2);
+  color: #111827;
+}
+
+/* ── Focus outlines ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Animations ── */
+@keyframes meshFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(30px, -20px) scale(1.05); }
+  66% { transform: translate(-20px, 15px) scale(0.95); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
