@@ -337,7 +337,7 @@ export default function OrderPage() {
     setFormError('');
     try {
       if (editingOrder) {
-        await orderService.updateOrder(editingOrder.id, data);
+        await orderService.updateOrder(editingOrder._id, data);
       } else {
         await orderService.createOrder(data);
       }
@@ -368,7 +368,7 @@ export default function OrderPage() {
 
   const handleDeleteConfirm = async () => {
     try {
-      await orderService.deleteOrder(deleteConfirm.id);
+      await orderService.deleteOrder(deleteConfirm._id);
       setDeleteConfirm(null);
       fetchOrders();
     } catch (err) {
@@ -434,7 +434,7 @@ export default function OrderPage() {
             <tbody>
               {orders.map((order) => (
                 <tr
-                  key={order.id}
+                  key={order._id}
                   onContextMenu={(e) => handleRowContext(e, order)}
                 >
                   <td>{formatDate(order.orderDate)}</td>

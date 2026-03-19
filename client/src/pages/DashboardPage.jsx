@@ -253,7 +253,7 @@ function TableWidget({ widget, orders }) {
             <tr><td colSpan={columns.length} style={{ textAlign: 'center', color: '#6b7a90' }}>No data</td></tr>
           )}
           {paged.map((o) => (
-            <tr key={o.id}>
+            <tr key={o._id}>
               {columns.map((col) => (
                 <td key={col}>
                   {col === 'status' ? (
