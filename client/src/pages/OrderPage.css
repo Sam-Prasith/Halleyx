@@ -485,3 +485,9 @@
 .btn-delete-row:hover {
   background: rgba(239, 68, 68, 0.15);
 }
+
+/* Fix dropdown option visibility */
+.form-group select option {
+  background: #1e2535;
+  color: #f1f5f9;
+}
