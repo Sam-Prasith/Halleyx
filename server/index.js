@@ -9,7 +9,6 @@ const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 
-// CORS setup
 const allowedOrigins = process.env.ALLOWED_ORIGINS
   ? process.env.ALLOWED_ORIGINS.split(',').map(origin => origin.trim())
   : [];
@@ -38,12 +37,10 @@ app.use(cors({
 
 app.use(express.json());
 
-// Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// Root route
 app.get('/', (req, res) => {
   res.send('Backend is running 🚀');
 });
