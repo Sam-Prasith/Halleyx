@@ -1,23 +1,18 @@
-const { DataTypes } = require('sequelize');
+const mongoose = require('mongoose');
 
-const defineDashboardLayoutModel = (sequelize) => {
-  if (sequelize.models.DashboardLayout) return sequelize.models.DashboardLayout;
+const defineDashboardLayoutModel = (connection) => {
+  if (connection.models.DashboardLayout) return connection.models.DashboardLayout;
 
-  const DashboardLayout = sequelize.define('DashboardLayout', {
-    id: {
-      type: DataTypes.UUID,
-      defaultValue: DataTypes.UUIDV4,
-      primaryKey: true,
-    },
+  const dashboardLayoutSchema = new mongoose.Schema({
     widgets: {
-      type: DataTypes.JSON, // For array of widget objects
-      defaultValue: [],
+      type: Array,
+      default: [],
     },
   }, {
-    timestamps: true, // adds updatedAt automatically
+    timestamps: true,
   });
 
-  return DashboardLayout;
+  return connection.model('DashboardLayout', dashboardLayoutSchema);
 };
 
 module.exports = defineDashboardLayoutModel;

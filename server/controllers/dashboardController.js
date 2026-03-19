@@ -20,7 +20,8 @@ const saveDashboard = async (req, res) => {
     const DashboardLayout = req.models.DashboardLayout;
     let dashboard = await DashboardLayout.findOne();
     if (dashboard) {
-      await dashboard.update({ widgets: req.body.widgets || [] });
+      dashboard.widgets = req.body.widgets || [];
+      await dashboard.save();
     } else {
       dashboard = await DashboardLayout.create({ widgets: req.body.widgets || [] });
     }
@@ -39,7 +40,8 @@ const updateDashboard = async (req, res) => {
     if (!dashboard) {
       return res.status(404).json({ message: 'Dashboard not found' });
     }
-    await dashboard.update({ widgets: req.body.widgets || dashboard.widgets });
+    dashboard.widgets = req.body.widgets || dashboard.widgets;
+    await dashboard.save();
     res.status(200).json(dashboard);
   } catch (error) {
     res.status(400).json({ message: error.message });

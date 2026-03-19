@@ -1,11 +1,7 @@
-const { Op } = require('sequelize');
-
 // @desc    Create new order
 // @route   POST /api/orders
 // @access  Public
 const createOrder = async (req, res) => {
-  console.log('--- DEBUG: createOrder ---');
-  console.log('req.models available:', req.models ? Object.keys(req.models) : 'null/undefined');
   try {
     const Order = req.models.Order;
     const order = await Order.create(req.body);
@@ -19,8 +15,6 @@ const createOrder = async (req, res) => {
 // @route   GET /api/orders
 // @access  Public
 const getOrders = async (req, res) => {
-  console.log('--- DEBUG: getOrders ---');
-  console.log('req.models available:', req.models ? Object.keys(req.models) : 'null/undefined');
   try {
     const { date } = req.query;
     let where = {};
@@ -30,15 +24,16 @@ const getOrders = async (req, res) => {
     if (date) {
       const startDate = new Date(date);
       startDate.setHours(0, 0, 0, 0);
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+      
       where.orderDate = {
-        [Op.gte]: startDate,
+        $gte: startDate,
+        $lte: endDate
       };
     }
 
-    const orders = await Order.findAll({
-      where,
-      order: [['orderDate', 'DESC']],
-    });
+    const orders = await Order.find(where).sort({ orderDate: -1 });
     res.status(200).json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -51,14 +46,19 @@ const getOrders = async (req, res) => {
 const updateOrder = async (req, res) => {
   try {
     const Order = req.models.Order;
-    const order = await Order.findByPk(req.params.id);
+    const order = await Order.findById(req.params.id);
     
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    // Sequelize hooks handle totalAmount calculation on beforeSave
-    await order.update(req.body);
+    // Remove _id from req.body to prevent immutable field errors
+    const updates = { ...req.body };
+    delete updates._id;
+
+    // Use order.set() which is the proper way to assign multiple fields in Mongoose
+    order.set(updates);
+    await order.save();
     
     res.status(200).json(order);
   } catch (error) {
@@ -72,13 +72,13 @@ const updateOrder = async (req, res) => {
 const deleteOrder = async (req, res) => {
   try {
     const Order = req.models.Order;
-    const order = await Order.findByPk(req.params.id);
+    const order = await Order.findById(req.params.id);
     
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
     
-    await order.destroy();
+    await order.deleteOne();
     res.status(200).json({ message: 'Order removed' });
   } catch (error) {
     res.status(500).json({ message: error.message });

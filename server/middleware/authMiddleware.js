@@ -14,26 +14,25 @@ const protect = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
       const decoded = jwt.verify(token, JWT_SECRET);
       
-      const coreSequelize = getCoreConnection();
-      const User = defineUserModel(coreSequelize);
+      const coreConnection = await getCoreConnection();
+      const User = defineUserModel(coreConnection);
       
-      const user = await User.findByPk(decoded.id);
+      const user = await User.findById(decoded.id).select('-password');
       if (!user) {
         return res.status(401).json({ message: 'Not authorized, user not found' });
       }
 
       req.user = user;
       // We use the ID as the tenant database name
-      // Note: If ID contains hyphens from UUID, encapsulate with backticks in queries (handled in tenantManager)
-      req.tenantId = `tenant_${user.id.toString().replace(/-/g, '_')}`;
+      req.tenantId = `tenant_${user._id.toString()}`;
       
-      const tenantSequelize = await getTenantConnection(req.tenantId);
+      const tenantDb = await getTenantConnection(req.tenantId);
       
-      // Ensure models are registered on this connection for the current process
-      const Order = defineOrderModel(tenantSequelize);
-      const DashboardLayout = defineDashboardLayoutModel(tenantSequelize);
+      // Models are already registered in getTenantConnection, but we can grab them here
+      const Order = defineOrderModel(tenantDb);
+      const DashboardLayout = defineDashboardLayoutModel(tenantDb);
 
-      req.tenantDb = tenantSequelize;
+      req.tenantDb = tenantDb;
       req.models = { Order, DashboardLayout };
       
       next();

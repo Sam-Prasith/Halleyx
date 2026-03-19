@@ -1,6 +1,5 @@
 const express = require('express');
-const { initCoreDb, getCoreConnection } = require('./db/tenantManager');
-const defineUserModel = require('./models/User');
+const { initCoreDb } = require('./db/tenantManager');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -34,12 +33,7 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await initCoreDb();
-    // Sync User table once at startup
-    const coreSequelize = getCoreConnection();
-    const User = defineUserModel(coreSequelize);
-    await User.sync();
-    console.log('User table synced.');
-
+    
     if (process.env.NODE_ENV !== 'production') {
       app.listen(PORT, () => {
         console.log(`Server is running on port ${PORT}`);

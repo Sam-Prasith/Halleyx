@@ -1,51 +1,27 @@
-const { Sequelize } = require('sequelize');
+const mongoose = require('mongoose');
 
 const connectionCache = {};
-let coreSequelize = null;
+let coreConnection = null;
 
 /**
  * Initializes and returns the core database connection (halleyx_core)
  */
-const getCoreConnection = () => {
-  if (!coreSequelize) {
-    coreSequelize = new Sequelize(
-      process.env.MYSQL_CORE_DB || 'halleyx_core',
-      process.env.MYSQL_USER || 'root',
-      process.env.MYSQL_PASSWORD || 'root',
-      {
-        host: process.env.MYSQL_HOST || 'localhost',
-        dialect: 'mysql',
-        logging: false,
-      }
-    );
-    console.log(`Connected to Core MySQL at ${process.env.MYSQL_CORE_DB || 'halleyx_core'}`);
+const getCoreConnection = async () => {
+  if (!coreConnection) {
+    const uri = process.env.MONGODB_URI;
+    if (!uri) throw new Error('MONGODB_URI not found in environment');
+    
+    // Core connection (halleyx_core)
+    coreConnection = await mongoose.createConnection(uri).asPromise();
+    console.log(`Connected to Core MongoDB: ${coreConnection.name}`);
   }
-  return coreSequelize;
+  return coreConnection;
 };
 
 const initCoreDb = async () => {
   try {
-    // First, connect WITHOUT a database to ensure it exists
-    const tempSequelize = new Sequelize(
-      '',
-      process.env.MYSQL_USER || 'root',
-      process.env.MYSQL_PASSWORD || 'root',
-      {
-        host: process.env.MYSQL_HOST || 'localhost',
-        dialect: 'mysql',
-        logging: false,
-      }
-    );
-    
-    const coreDbName = process.env.MYSQL_CORE_DB || 'halleyx_core';
-    await tempSequelize.query(`CREATE DATABASE IF NOT EXISTS \`${coreDbName}\`;`);
-    await tempSequelize.close();
-
-    const sequelize = getCoreConnection();
-    await sequelize.authenticate();
-    
-    console.log(`Core Database '${coreDbName}' is ready.`);
-    return sequelize;
+    await getCoreConnection();
+    console.log('Core Database is ready.');
   } catch (error) {
     console.error('Unable to connect to the core database:', error);
     throw error;
@@ -54,49 +30,29 @@ const initCoreDb = async () => {
 
 /**
  * Gets or creates a connection for a specific tenant (userId)
+ * Using the 'useDb' method for efficient database switching on a single cluster.
  */
 const getTenantConnection = async (tenantId) => {
   if (connectionCache[tenantId]) {
     return connectionCache[tenantId];
   }
 
-  // Ensure the tenant database exists
-  const core = getCoreConnection();
   try {
-    // Note: Creating database dynamically requires appropriate MySQL permissions
-    await core.query(`CREATE DATABASE IF NOT EXISTS \`${tenantId}\`;`);
-    console.log(`Ensured database exists for tenant: ${tenantId}`);
-  } catch (error) {
-    console.error(`Error ensuring database for tenant ${tenantId}:`, error);
-    // Continue anyway as it might already exist but query failed due to permissions
-  }
-
-  const tenantSequelize = new Sequelize(
-    tenantId,
-    process.env.MYSQL_USER || 'root',
-    process.env.MYSQL_PASSWORD || 'root',
-    {
-      host: process.env.MYSQL_HOST || 'localhost',
-      dialect: 'mysql',
-      logging: false,
-    }
-  );
-
-  try {
-    await tenantSequelize.authenticate();
+    const core = await getCoreConnection();
+    // In MongoDB, we can use useDb to switch databases on the same connection
+    // This is more efficient than creating a whole new connection pool
+    const tenantDb = core.useDb(tenantId, { useCache: true });
     
-    // Initialize & Sync models ONCE when connection is created
+    // Register models on this tenant database
     const defineOrderModel = require('../models/Order');
     const defineDashboardLayoutModel = require('../models/DashboardLayout');
-    const Order = defineOrderModel(tenantSequelize);
-    const DashboardLayout = defineDashboardLayoutModel(tenantSequelize);
     
-    await Order.sync();
-    await DashboardLayout.sync();
-
-    connectionCache[tenantId] = tenantSequelize;
-    console.log(`Created and synced new Sequelize connection for tenant: ${tenantId}`);
-    return tenantSequelize;
+    defineOrderModel(tenantDb);
+    defineDashboardLayoutModel(tenantDb);
+    
+    connectionCache[tenantId] = tenantDb;
+    console.log(`Switched to and cached MongoDB database for tenant: ${tenantId}`);
+    return tenantDb;
   } catch (error) {
     console.error(`Unable to connect to tenant database ${tenantId}:`, error);
     throw error;
