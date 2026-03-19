@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '',
+  baseURL: import.meta.env.VITE_API_URL || 'https://halleyx-e7md.onrender.com',
 });
 
 // Attach token to every request
