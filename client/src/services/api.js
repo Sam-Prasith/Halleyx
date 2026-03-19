@@ -4,7 +4,7 @@ const api = axios.create({
   baseURL: '',
 });
 
-// Add a request interceptor to add the auth token to every request
+// Attach token to every request
 api.interceptors.request.use(
   (config) => {
     const stored = localStorage.getItem('halleyx_user');
@@ -18,7 +18,17 @@ api.interceptors.request.use(
     }
     return config;
   },
+  (error) => Promise.reject(error)
+);
+
+// Auto-logout on 401
+api.interceptors.response.use(
+  (response) => response,
   (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('halleyx_user');
+      window.location.href = '/login';
+    }
     return Promise.reject(error);
   }
 );
