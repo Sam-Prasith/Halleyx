@@ -20,7 +20,7 @@ const defaultValues = {
   createdBy: '',
 };
 
-function OrderFormModal({ isOpen, onClose, onSubmit, editingOrder }) {
+function OrderFormModal({ isOpen, onClose, onSubmit, editingOrder, formError }) {
   const {
     register,
     handleSubmit,
@@ -76,6 +76,7 @@ function OrderFormModal({ isOpen, onClose, onSubmit, editingOrder }) {
             &times;
           </button>
         </div>
+        {formError && <div className="auth-error" style={{ margin: '0 24px' }}>{formError}</div>}
 
         <form onSubmit={handleSubmit(onFormSubmit)} noValidate>
           {/* Customer Information Section */}
@@ -309,6 +310,7 @@ export default function OrderPage() {
   const [editingOrder, setEditingOrder] = useState(null);
   const [contextMenu, setContextMenu] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [formError, setFormError] = useState('');
 
   const fetchOrders = useCallback(async () => {
     setLoading(true);
@@ -332,6 +334,7 @@ export default function OrderPage() {
   };
 
   const handleFormSubmit = async (data) => {
+    setFormError('');
     try {
       if (editingOrder) {
         await orderService.updateOrder(editingOrder.id, data);
@@ -343,6 +346,7 @@ export default function OrderPage() {
       fetchOrders();
     } catch (err) {
       console.error('Failed to save order', err);
+      setFormError(err.response?.data?.message || 'Failed to save order. Please try again.');
     }
   };
 
@@ -424,6 +428,7 @@ export default function OrderPage() {
                 <th>Unit Price</th>
                 <th>Total</th>
                 <th>Status</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -431,7 +436,6 @@ export default function OrderPage() {
                 <tr
                   key={order.id}
                   onContextMenu={(e) => handleRowContext(e, order)}
-                  title="Right-click for options"
                 >
                   <td>{formatDate(order.orderDate)}</td>
                   <td>
@@ -448,6 +452,10 @@ export default function OrderPage() {
                     <span className={`status-badge ${getStatusClass(order.status)}`}>
                       {order.status}
                     </span>
+                  </td>
+                  <td className="action-cell">
+                    <button className="btn-edit-row" onClick={() => { setEditingOrder(order); setModalOpen(true); }} title="Edit">✏️</button>
+                    <button className="btn-delete-row" onClick={() => setDeleteConfirm(order)} title="Delete">🗑️</button>
                   </td>
                 </tr>
               ))}
@@ -473,9 +481,11 @@ export default function OrderPage() {
         onClose={() => {
           setModalOpen(false);
           setEditingOrder(null);
+          setFormError('');
         }}
         onSubmit={handleFormSubmit}
         editingOrder={editingOrder}
+        formError={formError}
       />
 
       {/* Delete Confirm */}
