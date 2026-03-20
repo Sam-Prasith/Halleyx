@@ -45,7 +45,6 @@ export default function AppLayout() {
         </div>
 
         <nav className="app-nav">
-          <span className="nav-section-label">Main</span>
           <NavLink to="/orders" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <span className="nav-icon"><IconOrders /></span>
             <span>Orders</span>
@@ -54,7 +53,6 @@ export default function AppLayout() {
             <span className="nav-icon"><IconDashboard /></span>
             <span>Dashboard</span>
           </NavLink>
-          <span className="nav-section-label">Settings</span>
           <NavLink to="/dashboard/config" className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}>
             <span className="nav-icon"><IconConfig /></span>
             <span>Configure</span>
