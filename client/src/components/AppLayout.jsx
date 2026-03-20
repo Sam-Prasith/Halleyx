@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
 import './AppLayout.css';
@@ -21,8 +22,14 @@ const IconConfig = () => (
 );
 
 const IconLogout = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+  </svg>
+);
+
+const IconUser = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
   </svg>
 );
 
@@ -30,11 +37,24 @@ export default function AppLayout() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
 
   return (
     <div className="app-layout">
@@ -59,8 +79,9 @@ export default function AppLayout() {
           </NavLink>
         </nav>
 
-        <div className="app-sidebar-footer">
-          <div className="user-info">
+        {/* ── Account Menu ── */}
+        <div className="app-sidebar-footer" ref={menuRef}>
+          <button className="user-menu-btn" onClick={() => setMenuOpen((v) => !v)}>
             <div className="user-avatar">
               {user?.name?.charAt(0)?.toUpperCase() || 'U'}
             </div>
@@ -68,10 +89,33 @@ export default function AppLayout() {
               <span className="user-name">{user?.name || 'User'}</span>
               <span className="user-email">{user?.email || ''}</span>
             </div>
-          </div>
-          <button className="logout-btn" onClick={handleLogout} title="Sign out">
-            <IconLogout />
+            <svg className={`chevron ${menuOpen ? 'open' : ''}`} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <polyline points="18 15 12 9 6 15"/>
+            </svg>
           </button>
+
+          {menuOpen && (
+            <div className="user-dropdown">
+              <div className="user-dropdown-header">
+                <div className="user-avatar-lg">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <div>
+                  <div className="ud-name">{user?.name || 'User'}</div>
+                  <div className="ud-email">{user?.email || ''}</div>
+                </div>
+              </div>
+              <div className="user-dropdown-divider" />
+              <button className="ud-item" disabled>
+                <IconUser /> My Account
+                <span className="ud-badge">Soon</span>
+              </button>
+              <div className="user-dropdown-divider" />
+              <button className="ud-item ud-logout" onClick={handleLogout}>
+                <IconLogout /> Sign Out
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
