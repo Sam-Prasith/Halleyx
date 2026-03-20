@@ -203,3 +203,74 @@
   .user-info { justify-content: center; }
   .logout-btn { width: 100%; }
 }
+
+/* ── Mobile bottom nav ── */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+    height: 100dvh;
+  }
+
+  .app-sidebar {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: auto;
+    flex-direction: row;
+    align-items: center;
+    border-right: none;
+    border-bottom: 1px solid var(--glass-border);
+    padding: 0 12px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+  }
+
+  .app-sidebar::after { display: none; }
+
+  .app-brand {
+    padding: 12px 8px;
+    flex-shrink: 0;
+  }
+
+  .app-brand-name { display: block; font-size: 16px; }
+
+  .app-nav {
+    flex-direction: row;
+    flex: 1;
+    justify-content: center;
+    padding: 8px 4px;
+    gap: 4px;
+  }
+
+  .nav-item {
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px 10px;
+    font-size: 10px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .nav-item span:not(.nav-icon) {
+    display: block;
+    font-size: 10px;
+  }
+
+  .nav-icon { font-size: 18px; width: auto; }
+
+  .app-sidebar-footer {
+    flex-shrink: 0;
+    border-top: none;
+    border-left: 1px solid var(--glass-border);
+    padding: 8px;
+    flex-direction: row;
+    gap: 6px;
+  }
+
+  .user-details { display: none; }
+
+  .app-main {
+    flex: 1;
+    overflow-y: auto;
+  }
+}

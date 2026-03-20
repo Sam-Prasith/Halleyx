@@ -318,3 +318,22 @@
   .kpi-value { font-size: 22px; }
   .dash-table-wrapper { overflow-x: auto; }
 }
+
+@media (max-width: 480px) {
+  .dashboard-page { padding: 12px 10px; }
+  .dash-topbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .dash-topbar-right { width: 100%; flex-wrap: wrap; }
+  .date-filter { flex: 1; min-width: 0; }
+  .btn-configure { flex: 1; text-align: center; }
+  .dash-grid {
+    grid-template-columns: 1fr !important;
+    grid-auto-rows: auto !important;
+    gap: 10px;
+  }
+  .dash-widget-card {
+    grid-column: 1 / -1 !important;
+    grid-row: auto !important;
+    min-height: 220px;
+  }
+  .kpi-value { font-size: 26px; }
+}
