@@ -283,6 +283,8 @@
     border-left: 1px solid var(--border);
     padding: 8px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
   }
 
   .user-details { display: none; }
@@ -413,16 +415,20 @@
 /* ── Mobile dropdown fix ── */
 @media (max-width: 768px) {
   .app-sidebar-footer {
-    position: relative;
+    position: static;
+    border-top: none;
     border-left: 1px solid var(--border);
     padding: 6px 8px;
     flex-shrink: 0;
+    display: flex !important;
+    align-items: center;
   }
 
   .user-menu-btn {
     padding: 4px;
     margin: 0;
     gap: 0;
+    width: auto;
   }
 
   .user-details { display: none; }
@@ -430,9 +436,11 @@
 
   .user-dropdown {
     position: fixed;
+    top: auto;
     bottom: 70px;
     right: 8px;
     left: auto;
     width: 220px;
+    z-index: 999;
   }
 }
