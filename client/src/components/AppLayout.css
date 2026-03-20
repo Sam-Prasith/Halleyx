@@ -409,3 +409,30 @@
   background: rgba(239,68,68,0.08) !important;
   color: #f87171 !important;
 }
+
+/* ── Mobile dropdown fix ── */
+@media (max-width: 768px) {
+  .app-sidebar-footer {
+    position: relative;
+    border-left: 1px solid var(--border);
+    padding: 6px 8px;
+    flex-shrink: 0;
+  }
+
+  .user-menu-btn {
+    padding: 4px;
+    margin: 0;
+    gap: 0;
+  }
+
+  .user-details { display: none; }
+  .chevron { display: none; }
+
+  .user-dropdown {
+    position: fixed;
+    bottom: 70px;
+    right: 8px;
+    left: auto;
+    width: 220px;
+  }
+}
