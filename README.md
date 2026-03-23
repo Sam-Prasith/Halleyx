@@ -10,7 +10,8 @@
 ---
 
 ## 🚀 Live Demo
-Experience the platform live at: **(https://halleyxproject.vercel.app)**
+Experience the platform live at:https://halleyx-orders.vercel.app/
+
 Demo Video:https://drive.google.com/file/d/1XarqX_3zR2LMhybYQnrGNsD0zAbalOru/view?usp=sharing
 
 ---
